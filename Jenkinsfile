@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JDK_HOME'        // Use your existing JDK name
+        jdk 'JDK_HOME'       // JDK 17 configured in Global Tool Configuration
         maven 'MAVEN_HOME'
     }
 
