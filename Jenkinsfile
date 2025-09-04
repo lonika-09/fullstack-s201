@@ -2,8 +2,9 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JDK_HOME'
-        maven 'MAVEN_HOME'
+        // Replace these with the exact names configured in Jenkins Global Tool Configuration
+        jdk 'JDK11'
+        maven 'Maven3'
     }
 
     environment {
@@ -30,17 +31,13 @@ pipeline {
         stage('Build React Frontend') {
             steps {
                 script {
-                    // Set NodeJS tool
-                    def nodeHome = tool name: 'NODE_HOME', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
+                    // Replace with your NodeJS installation name in Jenkins
+                    def nodeHome = tool name: 'NodeJS16', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
                     env.PATH = "${nodeHome}/bin:${env.PATH}"
                 }
                 dir("${env.FRONTEND_DIR}") {
-                    // Fix Vite permission issue
-                    sh 'chmod +x node_modules/.bin/vite'
-
-                    // Install dependencies and build
                     sh 'npm install'
-                    sh 'npm run build'  // generates 'dist' folder
+                    sh 'npm run build'
                 }
             }
         }
@@ -51,11 +48,8 @@ pipeline {
                     def warDir = "${env.FRONTEND_DIR}/war_content"
                     sh "rm -rf ${warDir}"
                     sh "mkdir -p ${warDir}/META-INF ${warDir}/WEB-INF"
-
-                    // Copy files from dist to WAR folder
+                    // Copy only dist content
                     sh "cp -r ${env.FRONTEND_DIR}/dist/* ${warDir}/"
-
-                    // Create WAR file
                     sh "jar -cvf ${env.FRONTEND_WAR} -C ${warDir} ."
                 }
             }
