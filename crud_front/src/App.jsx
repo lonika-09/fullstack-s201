@@ -16,7 +16,10 @@ function App() {
   const handleChange = (e) => {
     setProduct({ ...product, [e.target.name]: e.target.value });
   };
-const BASE_URL = 'http://localhost:8080/springapp1';
+
+  // ✅ Updated BASE_URL with new Elastic IP and port 9090
+  const BASE_URL = 'http://52.5.162.102:9090/springapp1';
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -37,24 +40,18 @@ const BASE_URL = 'http://localhost:8080/springapp1';
   };
 
   const fetchProducts = async () => {
-    const res = await axios.get(`${BASE_URL}/display`);
-    setProducts(res.data);
+    try {
+      const res = await axios.get(`${BASE_URL}/display`);
+      setProducts(res.data);
+    } catch (err) {
+      console.error('Fetch failed:', err);
+    }
   };
 
   const editProduct = (p) => {
     setProduct(p);
     setIsEditing(true);
   };
-
-  /*
-  const deleteProduct = async (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      await axios.delete(`${BASE_URL}/delete/${id}`);
-      alert('Delete successful');
-      fetchProducts();
-    }
-  };
-  */
 
   useEffect(() => {
     fetchProducts();
@@ -167,14 +164,6 @@ const BASE_URL = 'http://localhost:8080/springapp1';
                 >
                   Edit
                 </button>
-                {/*
-                <button
-                  className="btn btn-danger btn-sm"
-                  onClick={() => deleteProduct(p.id)}
-                >
-                  Delete
-                </button>
-                */}
               </td>
             </tr>
           ))}
