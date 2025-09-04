@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JDK_HOME'       // Java 17 configured in Global Tool Configuration
-        maven 'MAVEN_HOME'   // Maven configured in Global Tool Configuration
+        jdk 'JDK_HOME'       // Must point to Java 21
+        maven 'MAVEN_HOME'
     }
 
     environment {
@@ -25,7 +25,7 @@ pipeline {
         stage('Verify JDK') {
             steps {
                 sh 'java -version'
-                sh 'echo JAVA_HOME=$JAVA_HOME'
+                sh 'echo $JAVA_HOME'
             }
         }
 
@@ -38,7 +38,6 @@ pipeline {
         stage('Build React Frontend') {
             steps {
                 script {
-                    // Set NodeJS path
                     def nodeHome = tool name: 'NODE_HOME', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
                     env.PATH = "${nodeHome}/bin:${env.PATH}"
                 }
@@ -73,21 +72,13 @@ pipeline {
 
         stage('Deploy Spring Boot WAR') {
             steps {
-                sh """
-                curl -u ${env.TOMCAT_USER}:${env.TOMCAT_PASS} \
-                     --upload-file "${env.BACKEND_WAR}" \
-                     "${env.TOMCAT_URL}/deploy?path=/springapp1&update=true"
-                """
+                sh "curl -u ${env.TOMCAT_USER}:${env.TOMCAT_PASS} --upload-file \"${env.BACKEND_WAR}\" \"${env.TOMCAT_URL}/deploy?path=/springapp1&update=true\""
             }
         }
 
         stage('Deploy Frontend WAR') {
             steps {
-                sh """
-                curl -u ${env.TOMCAT_USER}:${env.TOMCAT_PASS} \
-                     --upload-file "${env.FRONTEND_WAR}" \
-                     "${env.TOMCAT_URL}/deploy?path=/frontapp1&update=true"
-                """
+                sh "curl -u ${env.TOMCAT_USER}:${env.TOMCAT_PASS} --upload-file \"${env.FRONTEND_WAR}\" \"${env.TOMCAT_URL}/deploy?path=/frontapp1&update=true\""
             }
         }
     }
