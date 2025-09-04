@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JDK_17'        // Updated to Java 17
+        jdk 'JDK_HOME'        // Use your existing JDK name
         maven 'MAVEN_HOME'
     }
 
