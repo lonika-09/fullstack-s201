@@ -30,12 +30,17 @@ pipeline {
         stage('Build React Frontend') {
             steps {
                 script {
+                    // Set NodeJS tool
                     def nodeHome = tool name: 'NODE_HOME', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
                     env.PATH = "${nodeHome}/bin:${env.PATH}"
                 }
                 dir("${env.FRONTEND_DIR}") {
+                    // Fix Vite permission issue
+                    sh 'chmod +x node_modules/.bin/vite'
+
+                    // Install dependencies and build
                     sh 'npm install'
-                    sh 'npm run build'
+                    sh 'npm run build'  // generates 'dist' folder
                 }
             }
         }
@@ -46,7 +51,11 @@ pipeline {
                     def warDir = "${env.FRONTEND_DIR}/war_content"
                     sh "rm -rf ${warDir}"
                     sh "mkdir -p ${warDir}/META-INF ${warDir}/WEB-INF"
+
+                    // Copy files from dist to WAR folder
                     sh "cp -r ${env.FRONTEND_DIR}/dist/* ${warDir}/"
+
+                    // Create WAR file
                     sh "jar -cvf ${env.FRONTEND_WAR} -C ${warDir} ."
                 }
             }
